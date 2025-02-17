@@ -123,6 +123,12 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
         return isset($this->_origData[$key]) ? $this->_origData[$key] : null;
     }
 
+    public function getPathForEvent(): string
+    {
+        $path = $this->getPath();
+        return str_replace('/', '_', $path);
+    }
+
     /**
      * Initialize object original data
      *
@@ -402,6 +408,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
         $this->cleanModelCache();
         Mage::dispatchEvent('model_save_commit_after', ['object' => $this]);
         Mage::dispatchEvent($this->_eventPrefix . '_save_commit_after', $this->_getEventData());
+        Mage::dispatchEvent($this->_eventPrefix . '_save_commit_after_path_' . $this->getPathForEvent(), $this->_getEventData());
         return $this;
     }
 
@@ -434,6 +441,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
         }
         Mage::dispatchEvent('model_save_before', ['object' => $this]);
         Mage::dispatchEvent($this->_eventPrefix . '_save_before', $this->_getEventData());
+        Mage::dispatchEvent($this->_eventPrefix . '_save_before_path_' . $this->getPathForEvent(), $this->_getEventData());
         return $this;
     }
 
@@ -508,6 +516,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
     {
         Mage::dispatchEvent('model_save_after', ['object' => $this]);
         Mage::dispatchEvent($this->_eventPrefix . '_save_after', $this->_getEventData());
+        Mage::dispatchEvent($this->_eventPrefix . '_save_after_path_' . $this->getPathForEvent(), $this->_getEventData());
         return $this;
     }
 
@@ -543,6 +552,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
     {
         Mage::dispatchEvent('model_delete_before', ['object' => $this]);
         Mage::dispatchEvent($this->_eventPrefix . '_delete_before', $this->_getEventData());
+        Mage::dispatchEvent($this->_eventPrefix . '_delete_before_path_' . $this->getPathForEvent(), $this->_getEventData());
         $this->cleanModelCache();
         return $this;
     }
@@ -571,6 +581,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
     {
         Mage::dispatchEvent('model_delete_after', ['object' => $this]);
         Mage::dispatchEvent($this->_eventPrefix . '_delete_after', $this->_getEventData());
+        Mage::dispatchEvent($this->_eventPrefix . '_delete_after_path_' . $this->getPathForEvent(), $this->_getEventData());
         return $this;
     }
 
@@ -583,6 +594,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
     {
         Mage::dispatchEvent('model_delete_commit_after', ['object' => $this]);
         Mage::dispatchEvent($this->_eventPrefix . '_delete_commit_after', $this->_getEventData());
+        Mage::dispatchEvent($this->_eventPrefix . '_delete_commit_after_path_' . $this->getPathForEvent(), $this->_getEventData());
         return $this;
     }
 

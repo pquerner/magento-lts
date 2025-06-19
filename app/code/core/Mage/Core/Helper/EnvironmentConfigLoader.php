@@ -66,7 +66,7 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
 
             switch ($scope) {
                 case static::CONFIG_KEY_DEFAULT:
-                    [$unused1, $unused2, $section, $group, $field] = $configKeyParts;
+                    [$section, $group, $field] = $configKeyParts;
                     $path = $this->buildPath($section, $group, $field);
                     $nodePath = $this->buildNodePath($scope, $path);
                     $xmlConfig->setNode($nodePath, $value);
@@ -75,14 +75,14 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
                             $store = Mage::app()->getStore($store);
                             $this->setCache($store, $value, $path);
                         }
-                    } catch (Throwable $exception) {
+                    } catch (Throwable) {
                         // invalid store, intentionally empty
                     }
                     break;
 
                 case static::CONFIG_KEY_WEBSITES:
                 case static::CONFIG_KEY_STORES:
-                    [$unused1, $unused2, $storeCode, $section, $group, $field] = $configKeyParts;
+                    [$storeCode, $section, $group, $field] = $configKeyParts;
                     $path = $this->buildPath($section, $group, $field);
                     $storeCode = strtolower($storeCode);
                     $scope = strtolower($scope);
@@ -95,7 +95,7 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
                                 $this->setCache($store, $value, $path);
                             }
                         }
-                    } catch (Throwable $exception) {
+                    } catch (Throwable) {
                         // invalid store, intentionally empty
                     }
                     break;
@@ -104,6 +104,9 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
         Mage::register('current_env_config', true, true);
     }
 
+    /**
+     * @throws Mage_Core_Exception
+     */
     public function hasPath(string $wantedPath): bool
     {
         $data = Mage::registry("config_env_has_path_$wantedPath");
@@ -122,7 +125,7 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
 
             switch ($scope) {
                 case static::CONFIG_KEY_DEFAULT:
-                    [$unused1, $unused2, $section, $group, $field] = $configKeyParts;
+                    [$section, $group, $field] = $configKeyParts;
                     $path = $this->buildPath($section, $group, $field);
                     $nodePath = $this->buildNodePath($scope, $path);
                     $config[$nodePath] = $value;
@@ -130,7 +133,7 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
 
                 case static::CONFIG_KEY_WEBSITES:
                 case static::CONFIG_KEY_STORES:
-                    [$unused1, $unused2, $storeCode, $section, $group, $field] = $configKeyParts;
+                    [$storeCode, $section, $group, $field] = $configKeyParts;
                     $path = $this->buildPath($section, $group, $field);
                     $storeCode = strtolower($storeCode);
                     $scope = strtolower($scope);
@@ -144,6 +147,9 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
         return $hasConfig;
     }
 
+    /**
+     * @throws Mage_Core_Exception
+     */
     public function getAsArray(string $wantedStore): array
     {
         if (empty($wantedStore)) {
@@ -165,13 +171,13 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
 
             switch ($scope) {
                 case static::CONFIG_KEY_DEFAULT:
-                    [$unused1, $unused2, $section, $group, $field] = $configKeyParts;
+                    [$section, $group, $field] = $configKeyParts;
                     $path = $this->buildPath($section, $group, $field);
                     $config[$path] = $value;
                     break;
                 case static::CONFIG_KEY_WEBSITES:
                 case static::CONFIG_KEY_STORES:
-                    [$unused1, $unused2, $storeCode, $section, $group, $field] = $configKeyParts;
+                    [$storeCode, $section, $group, $field] = $configKeyParts;
                     if (strtolower($storeCode) !== strtolower($wantedStore)) {
                         break;
                     }
@@ -232,7 +238,9 @@ class Mage_Core_Helper_EnvironmentConfigLoader extends Mage_Core_Helper_Abstract
             ),
             'trim',
         );
-        [$unused, $scope] = $configKeyParts;
+
+        array_shift($configKeyParts);
+        $scope = array_shift($configKeyParts);
         return [$configKeyParts, $scope];
     }
 

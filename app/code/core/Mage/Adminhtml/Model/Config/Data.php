@@ -191,6 +191,7 @@ class Mage_Adminhtml_Model_Config_Data extends Varien_Object
                      * Delete config data if inherit
                      */
                     if (!$inherit) {
+                        Mage::app()->dispatchEvent('config_obj_saved', ['object' => $dataObject]);
                         $saveTransaction->addObject($dataObject);
                     } else {
                         $deleteTransaction->addObject($dataObject);

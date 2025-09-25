@@ -68,7 +68,7 @@ class Mage_Customer_Model_Flowpassword extends Mage_Core_Model_Abstract
                     ['gt' => Mage::getModel('core/date')->date(null, '-1 day')],
                 );
 
-            if ($forgotPassword->getSize() > $helper->getCustomerForgotPasswordEmailTimes()) {
+            if ($forgotPassword->getSize() >= $helper->getCustomerForgotPasswordEmailTimes()) {
                 return false;
             }
         }
@@ -98,7 +98,7 @@ class Mage_Customer_Model_Flowpassword extends Mage_Core_Model_Abstract
                     ['gt' => Mage::getModel('core/date')->date(null, '-1 hour')],
                 );
 
-            if ($forgotPassword->getSize() > $helper->getCustomerForgotPasswordIpTimes()) {
+            if ($forgotPassword->getSize() >= $helper->getCustomerForgotPasswordIpTimes()) {
                 return false;
             }
         }

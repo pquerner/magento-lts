@@ -715,8 +715,14 @@ class Mage_Customer_AccountController extends Mage_Core_Controller_Front_Action
     {
         $email = (string) $this->getRequest()->getPost('email');
         if ($email) {
+            if (!Zend_Validate::is($email, 'EmailAddress')) {
+                $this->_getSession()->setForgottenEmail($email);
+                $this->_getSession()->addError($this->__('Invalid email address.'));
+                $this->_redirect('*/*/forgotpassword');
+                return;
+            }
+
             $flowPassword = Mage::getModel('customer/flowpassword');
-            $flowPassword->setEmail($email)->save();
 
             if (!$flowPassword->checkCustomerForgotPasswordFlowEmail($email)) {
                 $this->_getSession()
@@ -731,12 +737,7 @@ class Mage_Customer_AccountController extends Mage_Core_Controller_Front_Action
                 return;
             }
 
-            if (!Zend_Validate::is($email, 'EmailAddress')) {
-                $this->_getSession()->setForgottenEmail($email);
-                $this->_getSession()->addError($this->__('Invalid email address.'));
-                $this->_redirect('*/*/forgotpassword');
-                return;
-            }
+            $flowPassword->setEmail($email)->save();
 
             $customer = Mage::getModel('customer/customer')
                 ->setWebsiteId(Mage::app()->getStore()->getWebsiteId())

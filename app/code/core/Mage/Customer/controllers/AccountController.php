@@ -723,6 +723,7 @@ class Mage_Customer_AccountController extends Mage_Core_Controller_Front_Action
             }
 
             $flowPassword = Mage::getModel('customer/flowpassword');
+            $flowPassword->setEmail($email);
 
             if (!$flowPassword->checkCustomerForgotPasswordFlowEmail($email)) {
                 $this->_getSession()
@@ -737,28 +738,28 @@ class Mage_Customer_AccountController extends Mage_Core_Controller_Front_Action
                 return;
             }
 
-            $flowPassword->setEmail($email)->save();
-
             $customer = Mage::getModel('customer/customer')
                 ->setWebsiteId(Mage::app()->getStore()->getWebsiteId())
                 ->loadByEmail($email);
 
             $customerId = $customer->getId();
-            if ($customerId) {
-                try {
-                    /** @var Helper $helper */
+
+            try {
+                $flowPassword->save();
+                if ($customerId) {
                     $helper = $this->_getHelper('customer');
                     $newResetPasswordLinkToken = $helper->generateResetPasswordLinkToken();
                     $newResetPasswordLinkCustomerId = $helper->generateResetPasswordLinkCustomerId($customerId);
                     $customer->changeResetPasswordLinkCustomerId($newResetPasswordLinkCustomerId);
                     $customer->changeResetPasswordLinkToken($newResetPasswordLinkToken);
                     $customer->sendPasswordResetConfirmationEmail();
-                } catch (Exception $exception) {
-                    $this->_getSession()->addError($exception->getMessage());
-                    $this->_redirect('*/*/forgotpassword');
-                    return;
                 }
+            } catch (Exception $exception) {
+                $this->_getSession()->addError($exception->getMessage());
+                $this->_redirect('*/*/forgotpassword');
+                return;
             }
+
             $this->_getSession()
                 ->addSuccess($this->_getHelper('customer')
                 ->__(
